@@ -1,0 +1,111 @@
+/* Shared styles for every page. Large, touch-friendly, made for an iPad in Safari. */
+:root {
+  --bg: #FFF8EE;
+  --card: #FFFFFF;
+  --ink: #1F2937;
+  --muted: #5B6474;
+  --line: #E8DFD0;
+  --math: #2F6FDE;
+  --math-soft: #E3ECFC;
+  --english: #D9480F;
+  --english-soft: #FDE8DA;
+  --good: #1F9D55;
+  --good-soft: #DDF4E6;
+  --try: #B45309;
+  --try-soft: #FEF0D7;
+  --accent: var(--math);
+  --accent-soft: var(--math-soft);
+  --radius: 22px;
+  --shadow: 0 4px 0 rgba(31, 41, 55, .10);
+  --font: "Avenir Next", "Avenir", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 22px;
+  line-height: 1.45;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+           max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  -webkit-tap-highlight-color: transparent;
+}
+
+.subject-page-math { --accent: var(--math); --accent-soft: var(--math-soft); }
+.subject-page-english { --accent: var(--english); --accent-soft: var(--english-soft); }
+
+main { max-width: 980px; margin: 0 auto; }
+h1 { font-size: clamp(32px, 5vw, 46px); line-height: 1.15; margin: 8px 0 12px; font-weight: 700; }
+h2 { font-size: 26px; margin: 36px 0 14px; font-weight: 700; }
+
+/* Back button at the top of every page except the home page */
+.topbar { max-width: 980px; margin: 0 auto 8px; display: flex; }
+.back {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: 56px; padding: 0 22px;
+  border-radius: 999px; border: 2px solid var(--line);
+  background: var(--card); color: var(--ink);
+  text-decoration: none; font-weight: 600; box-shadow: var(--shadow);
+}
+.back:active { transform: translateY(2px); box-shadow: none; }
+
+/* Home page */
+.hero { text-align: center; padding: 28px 0 4px; }
+.hero h1 { font-size: clamp(40px, 7vw, 60px); margin-bottom: 6px; }
+.hero p { color: var(--muted); margin: 0; font-size: 24px; }
+.subjects {
+  display: grid; gap: 24px; margin-top: 36px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.subject {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  min-height: 280px; border-radius: 34px;
+  color: #FFFFFF; text-decoration: none; font-size: 42px; font-weight: 700;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, .16);
+}
+.subject:active { transform: translateY(5px); box-shadow: 0 3px 0 rgba(0, 0, 0, .16); }
+.subject svg { width: 120px; height: 120px; }
+.subject-math { background: var(--math); }
+.subject-english { background: var(--english); }
+
+/* Lists of topics, activities and PDFs */
+.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.tile {
+  display: flex; align-items: center; gap: 16px;
+  min-height: 78px; padding: 12px 20px;
+  border-radius: var(--radius); border: 2px solid var(--line);
+  background: var(--card); color: var(--ink);
+  text-decoration: none; font-weight: 600; box-shadow: var(--shadow);
+}
+.tile:active { transform: translateY(2px); box-shadow: none; }
+.num {
+  flex: none; display: grid; place-items: center;
+  width: 50px; height: 50px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent); font-weight: 700;
+}
+.tile-text { display: flex; flex-direction: column; }
+.kind { font-size: 16px; font-weight: 600; color: var(--muted); }
+.tag {
+  margin-left: auto; flex: none;
+  font-size: 16px; font-weight: 700; color: var(--accent);
+  background: var(--accent-soft); padding: 6px 14px; border-radius: 999px;
+}
+.empty {
+  padding: 36px 24px; text-align: center; color: var(--muted);
+  border: 2px dashed var(--line); border-radius: var(--radius);
+}
+.parents { margin-top: 56px; padding-top: 4px; border-top: 2px dashed var(--line); }
+.parents h2 { font-size: 20px; color: var(--muted); }
+.parents .tile { min-height: 60px; font-size: 18px; }
+
+:focus-visible { outline: 4px solid var(--accent); outline-offset: 3px; }
+
+@media print {
+  body { background: #FFFFFF; padding: 0; }
+  .topbar { display: none; }
+}

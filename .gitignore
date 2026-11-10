@@ -1,0 +1,20 @@
+# Private files: never go to GitHub
+CLAUDE.local.md
+tools/private-words.txt
+*.local.*
+# School curriculum and her school documents: private, never published
+curriculum/
+
+# Keys and secrets must never be in this folder at all; ignore them just in case
+*.pem
+*.key
+id_*
+.env
+
+# Mac and editor clutter
+.DS_Store
+.claude/
+
+# Draft previews and temporary build files
+_drafts/
+*.tmp
