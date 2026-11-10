@@ -105,8 +105,10 @@ worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
   `explainer` (1-2 page visual explanation), `story` (English short story).
 
 ## Tools (run from the project folder; Python 3 standard library only)
-- `python3 tools/build.py`: rebuilds `site/` from `_shared/`, `math/`, `english/`, `worksheets/`.
-  A topic is a folder with `topic.json` (`title`, `items` of `{kind, slug, title, answers?}`);
+- `python3 tools/build.py`: rebuilds `site/` (public, **drafts left out**) from `_shared/`, `math/`,
+  `english/`, `worksheets/`. `python3 tools/build.py --preview` builds the private preview into
+  `_preview/` (git-ignored) **with drafts**, marked TASLAK / DRAFT.
+  A topic is a folder with `topic.json` (`title`, `draft?`, `items` of `{kind, slug, title, answers?, draft?}`);
   a lesson is `<topic>/<lesson-slug>/lesson.html` (page content only; the template adds the rest),
   with optional `lesson.css`, `lesson.js` and assets. Also writes `sw.js` (offline cache, versioned
   by content), `manifest.webmanifest`, `robots.txt`, `404.html`, `.nojekyll`.
@@ -114,9 +116,12 @@ worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
   Proven to catch a planted private word, outside link and form.
 - `python3 tools/make_icons.py`: makes `_shared/icons/*.png` from `_shared/icon.svg` with headless Chrome.
 - `python3 tools/publish.py "message"`: build, check, commit, push. Stops at the first problem and
-  refuses to commit unless Git uses the noreply email.
-- Preview drafts: `.claude/launch.json` config `site-preview` serves `site/` on http://localhost:8765
-  (the service worker only runs on https, so previews are never stale).
+  refuses to commit unless Git uses the noreply email. **Draft files stay on the iMac** (excluded from
+  the commit), so one chat can never publish the other chat's unapproved work.
+  `--dry-run` lists what would be uploaded without changing anything.
+- Preview: run `python3 tools/build.py --preview`, then `.claude/launch.json` config `site-preview`
+  serves `_preview/` on http://localhost:8765 (the service worker only runs on https, so previews
+  are never stale). Both chats share this preview server.
 - Page rules: no inline scripts or `on…=` handlers (the content security policy blocks them);
   put code in `lesson.js`. Tap to hear: any element with `data-say` is read aloud (`_shared/app.js`).
 - Publishing on GitHub: `.github/workflows/pages.yml` runs `tools/check.py --ci` and then publishes
@@ -128,7 +133,11 @@ worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
 - One lesson at a time. Before building it, explain in plain words what it will do, and ask what is
   needed (her level, what she finds hard, which curriculum).
 - Interactive HTML first: show a **draft**, the parent approves, **only then** publish.
-- Publishing after approval is automatic: build, run the check, commit, push.
+- **Draft lifecycle** (tested): every new item (lesson or PDF) or new topic is added to `topic.json`
+  with `"draft": true` → preview with `build.py --preview` → parent approves → remove `"draft"` →
+  `publish.py`. Never publish something the parent has not approved in this chat.
+  Changes to an already-published lesson are uploaded by the next publish from either chat, so
+  for larger changes to a published lesson, tell the parent before editing it.
 - The parent uses **two conversations** in this folder, one for Math and one for English.
   Shared parts (`_shared/`, `tools/`, `CLAUDE.md`) are changed in **only one conversation at a time**.
   Before changing them, say so; if the other conversation might be changing them, ask first.

@@ -1,5 +1,5 @@
 // Made by tools/build.py: do not edit.
-const CACHE = 'site-3d1af6e8963c';
+const CACHE = 'site-ee31974a92b3';
 const FILES = [
   "./",
   "./app.js",

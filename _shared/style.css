@@ -95,6 +95,8 @@ h2 { font-size: 26px; margin: 36px 0 14px; font-weight: 700; }
   font-size: 16px; font-weight: 700; color: var(--accent);
   background: var(--accent-soft); padding: 6px 14px; border-radius: 999px;
 }
+.tag + .tag { margin-left: 8px; }
+.tag-draft { color: #FFFFFF; background: var(--try); }
 .empty {
   padding: 36px 24px; text-align: center; color: var(--muted);
   border: 2px dashed var(--line); border-radius: var(--radius);

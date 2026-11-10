@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Build the website into site/ from _shared/, math/, english/ and worksheets/.
 
-Run:  python3 tools/build.py
-Uses only Python's standard library. site/ is deleted and rebuilt every time: never edit it by hand.
+Run:  python3 tools/build.py            the public website, into site/ (drafts left out)
+      python3 tools/build.py --preview  a private preview, into _preview/ (drafts included, marked)
+Uses only Python's standard library. The output folder is deleted and rebuilt every time: never edit it by hand.
+
+Drafts: add "draft": true to an item (or to the whole topic) in topic.json. Drafts appear only in the
+preview, never on the website, and tools/publish.py keeps their files on the iMac until approved.
 
 Lesson sources:
   <subject>/<NN-topic>/topic.json
@@ -25,6 +29,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SHARED = ROOT / "_shared"
 SITE = ROOT / "site"
+PREVIEW = ROOT / "_preview"
+OUT = SITE
+INCLUDE_DRAFTS = False
 WORKSHEETS = ROOT / "worksheets"
 
 APP_NAME = "Öğrenmek Güzel"
@@ -39,7 +46,7 @@ SUBJECTS = {
         "pdfs": "Yazdırılabilir sayfalar", "parents": "Veli için", "answers": "Cevap anahtarı",
         "kinds": {"worksheet": "Çalışma kâğıdı", "revision": "Tekrar", "explainer": "Konu anlatımı",
                   "story": "Hikâye"},
-        "lesson_tag": "Başla",
+        "lesson_tag": "Başla", "draft": "TASLAK",
     },
     "english": {
         "lang": "en-US", "title": "English", "home": "Home", "topics": "Topics",
@@ -47,7 +54,7 @@ SUBJECTS = {
         "pdfs": "Printable pages", "parents": "For parents", "answers": "Answer key",
         "kinds": {"worksheet": "Worksheet", "revision": "Revision", "explainer": "Explainer",
                   "story": "Story"},
-        "lesson_tag": "Start",
+        "lesson_tag": "Start", "draft": "DRAFT",
     },
 }
 
@@ -69,6 +76,7 @@ ENGLISH_ICON = (
 TEMPLATE = (SHARED / "template.html").read_text(encoding="utf-8")
 written: list[str] = []
 warnings: list[str] = []
+left_out: list[str] = []
 
 
 def esc(value) -> str:
@@ -76,7 +84,7 @@ def esc(value) -> str:
 
 
 def write(rel: str, data: str | bytes) -> None:
-    out = SITE / rel
+    out = OUT / rel
     out.parent.mkdir(parents=True, exist_ok=True)
     if isinstance(data, bytes):
         out.write_bytes(data)
@@ -87,6 +95,12 @@ def write(rel: str, data: str | bytes) -> None:
 
 def copy(src: Path, rel: str) -> None:
     write(rel, src.read_bytes())
+
+
+def draft_tag(subject: str, obj: dict) -> str:
+    if not obj.get("draft"):
+        return ""
+    return f'<span class="tag tag-draft">{esc(SUBJECTS[subject]["draft"])}</span>'
 
 
 def back(href: str, label: str) -> str:
@@ -115,7 +129,16 @@ def load_topics(subject: str) -> list[dict]:
             continue
         data = json.loads(meta.read_text(encoding="utf-8"))
         data["slug"], data["dir"] = d.name, d
-        data.setdefault("items", [])
+        if data.get("draft") and not INCLUDE_DRAFTS:
+            left_out.append(f"{subject}/{d.name} (whole topic)")
+            continue
+        items = []
+        for item in data.get("items", []):
+            if item.get("draft") and not INCLUDE_DRAFTS:
+                left_out.append(f"{subject}/{d.name}/{item.get('slug')}")
+            else:
+                items.append(item)
+        data["items"] = items
         topics.append(data)
     return topics
 
@@ -138,7 +161,7 @@ def build_subject(subject: str) -> None:
     if topics:
         rows = "\n".join(
             f'  <li><a class="tile" href="{esc(tp["slug"])}/"><span class="num">{i}</span>'
-            f'<span class="tile-text">{esc(tp["title"])}</span></a></li>'
+            f'<span class="tile-text">{esc(tp["title"])}</span>{draft_tag(subject, tp)}</a></li>'
             for i, tp in enumerate(topics, start=1)
         )
         body = f'<h2>{esc(t["topics"])}</h2>\n<ul class="list">\n{rows}\n</ul>'
@@ -180,7 +203,8 @@ def build_topic(subject: str, topic: dict) -> None:
             if build_lesson(subject, topic, item):
                 lessons.append(
                     f'  <li><a class="tile" href="{esc(item["slug"])}/"><span class="tile-text">'
-                    f'{esc(item["title"])}</span><span class="tag">{esc(t["lesson_tag"])}</span></a></li>')
+                    f'{esc(item["title"])}</span>{draft_tag(subject, item)}'
+                    f'<span class="tag">{esc(t["lesson_tag"])}</span></a></li>')
         elif kind in PDF_KINDS:
             pdf = WORKSHEETS / subject / topic["slug"] / f'{item["slug"]}.pdf'
             if not pdf.exists():
@@ -190,7 +214,7 @@ def build_topic(subject: str, topic: dict) -> None:
             pdfs.append(
                 f'  <li><a class="tile" href="pdf/{esc(pdf.name)}"><span class="tile-text">'
                 f'<span class="kind">{esc(t["kinds"][kind])}</span>{esc(item["title"])}</span>'
-                f'<span class="tag">PDF</span></a></li>')
+                f'{draft_tag(subject, item)}<span class="tag">PDF</span></a></li>')
             key = pdf.with_name(f'{item["slug"]}-answers.pdf')
             if key.exists():
                 copy(key, f'{subject}/{topic["slug"]}/pdf/{key.name}')
@@ -246,7 +270,7 @@ def build_service_worker() -> None:
     for rel in sorted(written):
         if rel.endswith(".pdf") or rel in (".nojekyll", "404.html"):
             continue
-        digest.update(rel.encode() + b"\0" + (SITE / rel).read_bytes())
+        digest.update(rel.encode() + b"\0" + (OUT / rel).read_bytes())
         urls.append("./" + rel)
         if rel.endswith("/index.html"):
             urls.append("./" + rel[: -len("index.html")])
@@ -287,12 +311,15 @@ self.addEventListener('fetch', (event) => {{
 
 
 def main() -> int:
-    if SITE.resolve() != (ROOT / "site").resolve() or SITE.name != "site":
+    global OUT, INCLUDE_DRAFTS
+    if "--preview" in sys.argv:
+        OUT, INCLUDE_DRAFTS = PREVIEW, True
+    if OUT.parent.resolve() != ROOT.resolve() or OUT.name not in ("site", "_preview"):
         print("Refusing to clean an unexpected folder.")
         return 1
-    if SITE.exists():
-        shutil.rmtree(SITE)
-    SITE.mkdir()
+    if OUT.exists():
+        shutil.rmtree(OUT)
+    OUT.mkdir()
     build_static()
     build_home()
     for subject in SUBJECTS:
@@ -300,7 +327,10 @@ def main() -> int:
     build_service_worker()
     for w in warnings:
         print("WARNING:", w)
-    print(f"Built {len(written)} files into site/.")
+    if left_out:
+        print(f"Left out {len(left_out)} draft(s): " + ", ".join(left_out))
+    where = "_preview/ (private preview, drafts included)" if INCLUDE_DRAFTS else "site/ (public website)"
+    print(f"Built {len(written)} files into {where}.")
     return 0
 
 

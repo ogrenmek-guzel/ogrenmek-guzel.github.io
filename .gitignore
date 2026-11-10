@@ -18,3 +18,4 @@ id_*
 # Draft previews and temporary build files
 _drafts/
 *.tmp
+_preview/
