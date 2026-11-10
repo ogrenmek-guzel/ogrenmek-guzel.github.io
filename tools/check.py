@@ -129,13 +129,62 @@ def pdf_texts(data: bytes) -> list[str]:
                 pass
         for s in re.findall(rb"\(\xfe\xff((?:[^)\\]|\\.)*)\)", c, re.S):
             texts.append(s.decode("utf-16-be", "ignore"))
+    texts += pdf_visible_text(chunks)
     return texts
+
+
+def parse_cmap(c: bytes) -> dict[int, str]:
+    """Glyph code -> Unicode text, from a PDF ToUnicode CMap (how Chrome stores the real letters)."""
+    m: dict[int, str] = {}
+
+    def uni(h: bytes) -> str:
+        try:
+            return bytes.fromhex(h.decode()).decode("utf-16-be", "ignore")
+        except ValueError:
+            return ""
+    for block in re.findall(rb"beginbfchar(.*?)endbfchar", c, re.S):
+        for src, dst in re.findall(rb"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>", block):
+            m[int(src, 16)] = uni(dst)
+    for block in re.findall(rb"beginbfrange(.*?)endbfrange", c, re.S):
+        for lo, hi, rest in re.findall(rb"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*(<[0-9A-Fa-f]+>|\[[^\]]*\])", block):
+            lo_i, hi_i = int(lo, 16), int(hi, 16)
+            if rest.startswith(b"["):
+                for i, d in enumerate(re.findall(rb"<([0-9A-Fa-f]+)>", rest)):
+                    m[lo_i + i] = uni(d)
+            else:
+                start = uni(rest[1:-1])
+                if start:
+                    for i in range(min(hi_i - lo_i + 1, 4096)):
+                        m[lo_i + i] = start[:-1] + chr(ord(start[-1]) + i)
+    return m
+
+
+def pdf_visible_text(chunks: list[bytes]) -> list[str]:
+    """The text printed on the pages (including any header/footer), decoded with each font's CMap."""
+    cmaps = [parse_cmap(c) for c in chunks if b"begincmap" in c]
+    contents = [c for c in chunks if re.search(rb"\b(Tj|TJ)\b", c)]
+    out = []
+    for cmap in cmaps:
+        if not cmap:
+            continue
+        width = 2 if max(cmap) > 0xFF else 1
+        for content in contents:
+            pieces = []
+            for h in re.findall(rb"<([0-9A-Fa-f]+)>", content):
+                raw = bytes.fromhex(h.decode()) if len(h) % 2 == 0 else b""
+                pieces.append("".join(cmap.get(int.from_bytes(raw[i:i + width], "big"), "")
+                                      for i in range(0, len(raw), width)))
+            text = "".join(pieces)
+            if text:
+                out += [text, re.sub(r"\s+", "", text)]
+    return out
 
 
 def check_pdf(path: Path, words: list[str]) -> None:
     data = path.read_bytes()
+    squeezed_words = [re.sub(r"\s+", "", w) for w in words]
     for text in pdf_texts(data):
-        scan_text(path, text, words, " (inside the PDF)")
+        scan_text(path, text, words + squeezed_words, " (inside the PDF)")
         for uri in re.findall(r"/URI\s*\(([^)]*)\)", text):
             if re.match(r"[a-z][a-z0-9+.-]*:", uri, re.I):
                 problem(path, f"PDF contains a link to {uri[:60]!r}")

@@ -311,11 +311,11 @@ def build_static() -> None:
 
 
 def build_service_worker() -> None:
-    """Offline support: every page, style, script and icon is saved on the iPad on the first visit.
-    PDFs are saved the first time each one is opened. A new version replaces the old copy."""
+    """Offline support: every page, style, script, icon and PDF (worksheets, answer keys, explainers,
+    stories made by us) is saved on the iPad on the first visit. A new version replaces the old copy."""
     urls, digest = ["./"], hashlib.sha256()
     for rel in sorted(written):
-        if rel.endswith(".pdf") or rel in (".nojekyll", "404.html"):
+        if rel in (".nojekyll", "404.html"):
             continue
         digest.update(rel.encode() + b"\0" + (OUT / rel).read_bytes())
         urls.append("./" + rel)

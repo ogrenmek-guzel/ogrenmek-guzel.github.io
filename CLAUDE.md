@@ -43,6 +43,11 @@ Private rules live in `CLAUDE.local.md` (not in Git): **read it at the start of 
 - Static website on **GitHub Pages** from a **public** repository (free).
 - On the iPad: Safari, then Share > Add to Home Screen, so it opens like an app.
 - **Works offline** after the first visit: a service worker plus a web app manifest (https only).
+  Every page **and every PDF we generate** (worksheets, answer keys, explainers, stories) is saved
+  on the iPad at the first visit (decided). The parent's own documents in `curriculum/` are never
+  published, so never on the iPad. New content arrives the next time the app opens online.
+- Page addresses can be renamed freely (links are rebuilt, the Home Screen icon starts at `/`);
+  only the main address `ogrenmek-guzel.github.io` should not change (icon would need re-adding).
 - Search engines are asked not to index it: `robots.txt` (Disallow all) and
   `<meta name="robots" content="noindex, nofollow">` on every page.
 
@@ -127,7 +132,11 @@ worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
   with optional `lesson.css`, `lesson.js` and assets. Also writes `sw.js` (offline cache, versioned
   by content), `manifest.webmanifest`, `robots.txt`, `404.html`, `.nojekyll`.
 - `python3 tools/check.py`: the safety check (see Safety rules). Also scans every file going to GitHub.
-  Proven to catch a planted private word, outside link and form.
+  Proven to catch a planted private word, outside link and form. For PDFs it decodes the text
+  printed on the pages (via the fonts' ToUnicode maps) plus metadata and links.
+- **PDF rule**: always print with Chrome's `--no-pdf-header-footer`. Without it Chrome prints the
+  local file path and date on every page; the check catches this (tested), but never rely on that.
+  Chrome sets only Title (from `<title>`), Creator (browser) and Producer (Skia) as metadata.
 - `python3 tools/make_icons.py`: makes `_shared/icons/*.png` from `_shared/icon.svg` with headless Chrome.
 - `python3 tools/publish.py "message"`: build, check, commit, push. Stops at the first problem and
   refuses to commit unless Git uses the noreply email. **Draft files stay on the iMac** (excluded from
