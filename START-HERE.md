@@ -30,8 +30,9 @@ Turkish titles appear on the pages themselves.
 ## How a lesson is made
 1. You ask for a lesson (in the Math conversation or the English conversation).
 2. Claude explains what it will do and asks questions.
-3. Claude shows you a draft. You try it.
-4. You say "approved". Claude builds it, checks it for safety, and publishes it.
+3. Claude shows you a draft, marked **TASLAK** (Math) or **DRAFT** (English). Drafts stay on the
+   iMac only: they never go online, even when the other chat publishes something.
+4. You say "approved". Claude removes the draft mark, checks it for safety, and publishes it.
 5. On the iPad, the new lesson appears on the home page.
 
 ## Two conversations
