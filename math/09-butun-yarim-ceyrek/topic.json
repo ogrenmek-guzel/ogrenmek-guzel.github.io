@@ -4,8 +4,18 @@
   "items": [
     {
       "kind": "lesson",
-      "slug": "lesson-01-butun-yarim-ceyrek",
-      "title": "Bütün, Yarım ve Çeyrek"
+      "slug": "lesson-01-kesfedelim",
+      "title": "Keşfedelim: Bütün, Yarım ve Çeyrek"
+    },
+    {
+      "kind": "lesson",
+      "slug": "lesson-02-alistirmalar",
+      "title": "Alıştırmalar (14 soru)"
+    },
+    {
+      "kind": "explainer",
+      "slug": "explainer-01-butun-yarim-ceyrek",
+      "title": "Bütün, Yarım ve Çeyrek (konu anlatımı)"
     },
     {
       "kind": "worksheet",

@@ -172,6 +172,9 @@
     eraser: 'silgi', plum: 'erik'
   };
   D.name = function (food) { return NAMES[food]; };
+  // The inside of a round food (no outline svg), for pages that animate pieces themselves.
+  D.disk = function (food, cx, cy, r) { return DISKS[food](cx, cy, r); };
+  D.whole = function (food) { return D.food(food, 'whole'); };
 
   // food: a name from above. portion: 'whole', 'half', 'quarter' (and for toast also 'halfTri').
   // opts.ghost: show the missing part of the whole as a dashed outline.

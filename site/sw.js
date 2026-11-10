@@ -1,5 +1,5 @@
 // Made by tools/build.py: do not edit.
-const CACHE = 'site-74ad94baf052';
+const CACHE = 'site-73a550c21e6f';
 const FILES = [
   "./",
   "./app.js",
@@ -17,11 +17,16 @@ const FILES = [
   "./math/",
   "./math/09-butun-yarim-ceyrek/",
   "./math/09-butun-yarim-ceyrek/index.html",
-  "./math/09-butun-yarim-ceyrek/lesson-01-butun-yarim-ceyrek/",
-  "./math/09-butun-yarim-ceyrek/lesson-01-butun-yarim-ceyrek/draw.js",
-  "./math/09-butun-yarim-ceyrek/lesson-01-butun-yarim-ceyrek/index.html",
-  "./math/09-butun-yarim-ceyrek/lesson-01-butun-yarim-ceyrek/lesson.css",
-  "./math/09-butun-yarim-ceyrek/lesson-01-butun-yarim-ceyrek/lesson.js",
+  "./math/09-butun-yarim-ceyrek/lesson-01-kesfedelim/",
+  "./math/09-butun-yarim-ceyrek/lesson-01-kesfedelim/index.html",
+  "./math/09-butun-yarim-ceyrek/lesson-01-kesfedelim/lesson.css",
+  "./math/09-butun-yarim-ceyrek/lesson-01-kesfedelim/lesson.js",
+  "./math/09-butun-yarim-ceyrek/lesson-02-alistirmalar/",
+  "./math/09-butun-yarim-ceyrek/lesson-02-alistirmalar/draw.js",
+  "./math/09-butun-yarim-ceyrek/lesson-02-alistirmalar/index.html",
+  "./math/09-butun-yarim-ceyrek/lesson-02-alistirmalar/lesson.css",
+  "./math/09-butun-yarim-ceyrek/lesson-02-alistirmalar/lesson.js",
+  "./math/09-butun-yarim-ceyrek/pdf/explainer-01-butun-yarim-ceyrek.pdf",
   "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers.pdf",
   "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek.pdf",
   "./math/index.html",

@@ -209,5 +209,7 @@ worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
 - [x] GitHub Pages switched to "GitHub Actions"; first version live at https://ogrenmek-guzel.github.io/
       (workflow and safety check passed on GitHub; offline cache confirmed; project files not served).
 - [ ] Parent adds the site to the iPad Home Screen.
-- [x] First Math lesson: `math/09-butun-yarim-ceyrek` (book Unit 2, p. 86-91): iPad lesson (14 steps) and
-      7-page worksheet with answer key: approved and published.
+- [x] First Math topic published: `math/09-butun-yarim-ceyrek` (book Unit 2, p. 86-91): interactive explanation
+      lesson (`lesson-01-kesfedelim`, 7 screens), exercise lesson (`lesson-02-alistirmalar`, 14 steps),
+      2-page explainer PDF, 7-page worksheet with answer key. Shared drawings: `lesson-02-alistirmalar/draw.js`.
+- Each Math topic gets: an interactive explanation lesson first, then exercises, an explainer PDF and a worksheet.
