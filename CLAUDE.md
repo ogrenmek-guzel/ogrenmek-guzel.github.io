@@ -130,6 +130,11 @@ worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
   knows the private words (until then it warns and checks everything else).
 
 ## How we work
+- **The parent decides what to make and in what order.** He tells Claude each time which lesson,
+  worksheet or story to make next. Claude does not plan a course, build ahead, or make anything he
+  has not asked for (suggestions are fine, as suggestions). He does no building himself: Claude builds.
+- Topic numbers (`01-…`, `02-…`) follow the order the parent gives; when a new topic arrives, ask
+  where it goes if that is unclear.
 - One lesson at a time. Before building it, explain in plain words what it will do, and ask what is
   needed (her level, what she finds hard, which curriculum).
 - Interactive HTML first: show a **draft**, the parent approves, **only then** publish.
