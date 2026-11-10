@@ -154,5 +154,7 @@ worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
 - [ ] Waiting for: curriculum documents in `curriculum/`.
 - [x] GitHub account, repository and deploy key set up; connection tested.
 - [x] Template, home page, icons, build, check and publish scripts (PDF script still to come).
-- [ ] GitHub Pages switched to "GitHub Actions" and first version pushed.
+- [x] GitHub Pages switched to "GitHub Actions"; first version live at https://ogrenmek-guzel.github.io/
+      (workflow and safety check passed on GitHub; offline cache confirmed; project files not served).
+- [ ] Parent adds the site to the iPad Home Screen.
 - [ ] First lesson.
