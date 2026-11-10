@@ -1,0 +1,165 @@
+/* Printed worksheet (A4). Same drawings and colours as the iPad lesson. */
+@page { size: A4; margin: 0; }
+:root {
+  --ink: #1F2937; --muted: #5B6474; --line: #E8DFD0;
+  --accent: #2F6FDE; --accent-soft: #E3ECFC; --good: #1F9D55; --good-soft: #DDF4E6;
+  --key: #D6336C; --shade: #FF922B; --shade-line: #1F2937;
+  --font: "Avenir Next", "Avenir", system-ui, sans-serif;
+}
+* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+html, body { margin: 0; padding: 0; background: #FFFFFF; }
+body { font-family: var(--font); color: var(--ink); font-size: 13.5pt; line-height: 1.35; }
+
+.page {
+  position: relative; width: 210mm; height: 297mm; padding: 11mm 13mm 16mm; overflow: hidden;
+  page-break-after: always; break-after: page;
+}
+.page:last-child { page-break-after: auto; break-after: auto; }
+footer {
+  position: absolute; left: 13mm; right: 13mm; bottom: 7mm;
+  display: flex; justify-content: space-between; font-size: 9.5pt; color: var(--muted);
+  border-top: 1px solid var(--line); padding-top: 2mm;
+}
+
+/* Title */
+.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8mm;
+  padding: 4mm 6mm; border-radius: 6mm; background: var(--accent-soft); margin-bottom: 5mm; }
+.kicker { margin: 0; color: var(--accent); font-weight: 700; font-size: 11pt; }
+h1 { margin: 0; font-size: 25pt; line-height: 1.15; }
+.namebox p { margin: 1mm 0 3mm; font-weight: 600; white-space: nowrap; }
+.line { display: inline-block; border-bottom: 1.5px dotted var(--ink); height: 1em; vertical-align: bottom; }
+.w40 { width: 40mm; }
+.keyband { display: none; margin: 1mm 0 0; color: #FFFFFF; background: var(--key); font-weight: 700;
+  padding: 1mm 4mm; border-radius: 3mm; width: max-content; font-size: 11pt; }
+
+/* Questions */
+.q { margin-bottom: 5mm; }
+.qhead { display: flex; align-items: center; gap: 2.5mm; }
+.qhead .no { display: grid; place-items: center; width: 9mm; height: 9mm; border-radius: 50%;
+  background: var(--accent); color: #FFFFFF; font-weight: 700; font-size: 13pt; }
+.pill { padding: .6mm 3mm; border-radius: 99px; background: var(--accent); color: #FFFFFF; font-weight: 700; font-size: 10pt; }
+.pill.soft { background: var(--accent-soft); color: var(--accent); }
+.pill.new { background: #AE3EC9; }
+.ask { margin: 2mm 0 3mm; font-weight: 600; }
+.sub { margin: 3mm 0 1mm; font-weight: 600; }
+.newtitle { margin: 0 0 4mm; font-size: 20pt; color: #AE3EC9; }
+.newtitle small { font-size: 12pt; color: var(--muted); font-weight: 600; }
+
+.row2, .row3, .row4, .row5 { display: grid; gap: 4mm; align-items: end; }
+.row2 { grid-template-columns: repeat(2, 1fr); }
+.row3 { grid-template-columns: repeat(3, 1fr); }
+.row4 { grid-template-columns: repeat(4, 1fr); }
+.row5 { grid-template-columns: repeat(5, 1fr); }
+.cell { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2mm; text-align: center; }
+.cell p { margin: 0; }
+.boxed { border: 1.5px solid var(--line); border-radius: 4mm; padding: 2mm; }
+.fig { width: 30mm; }
+.fig.small { width: 22mm; }
+.fig.tiny { width: 18mm; margin: 0 auto; }
+.fig.mid { width: 40mm; }
+.fig.wide { width: 56mm; }
+.fig.sq { width: 34mm; }
+.label { font-weight: 700; color: var(--accent); }
+
+/* Shapes, foods and fractions (as in the lesson, a little thinner for paper) */
+.shape, .food { display: block; width: 100%; height: auto; }
+.shape .p { fill: #FFFFFF; stroke: var(--shade-line); stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.shape .p.on { fill: var(--shade); }
+.frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.05; font-weight: 700; vertical-align: middle; }
+.frac > span { padding: 0 1.5mm; }
+.frac > span:first-child { border-bottom: 2px solid currentColor; }
+.shape .p { stroke-width: 1.6; }
+.shape.empty .p { fill: none; stroke-width: 2; }
+.shape.ghostparts .p { fill: none; stroke: #ADB5BD; stroke-dasharray: 4 3; }
+.shape.ghostparts .p.on { fill: var(--shade); stroke: var(--shade-line); stroke-dasharray: none; }
+.grid-paper { padding: 4mm; border-radius: 3mm;
+  background-color: #FFFFFF;
+  background-image: linear-gradient(#D0EBFF 1px, transparent 1px), linear-gradient(90deg, #D0EBFF 1px, transparent 1px);
+  background-size: 5mm 5mm; border: 1px solid #A5D8FF; }
+
+/* Writing places */
+.blank { position: relative; display: inline-block; min-width: 30mm; min-height: 8mm; border-bottom: 1.5px dotted var(--ink); text-align: center; }
+.blank.w50 { min-width: 50mm; }
+.blank.full { display: block; width: 100%; margin-top: 3mm; }
+.ex { color: var(--muted); font-style: italic; font-weight: 600; }
+.ans { visibility: hidden; color: var(--key); font-weight: 700; font-style: italic; }
+.fbox { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; gap: 1mm; }
+.fbox .b { display: grid; place-items: center; width: 9mm; height: 8mm; border: 1.5px dashed #868E96; border-radius: 1.5mm; font-weight: 700; font-size: 14pt; }
+.fbox .b:first-child { position: relative; margin-bottom: 1.5mm; }
+.fbox .b:first-child::after { content: ""; position: absolute; left: -2mm; right: -2mm; bottom: -2.4mm; border-bottom: 2px solid var(--ink); }
+.fbox.big .b { width: 12mm; height: 10mm; font-size: 17pt; }
+.fbox.example .b { color: var(--muted); }
+.key .fbox:not(.example) .b { color: var(--key); }
+.numbox { display: inline-grid; place-items: center; width: 10mm; height: 9mm; border: 1.5px dashed #868E96; border-radius: 1.5mm; vertical-align: middle; }
+.big .frac, .big.frac { font-size: 22pt; color: var(--accent); }
+
+/* Matching */
+.matchrows { display: grid; }
+.matchrows .row3 { gap: 0; }
+.matchrows .cell.boxed { margin: 0 3mm; }
+.dot { position: absolute; width: 4mm; height: 4mm; border-radius: 50%; border: 1.5px solid #845EF7; background: #FFFFFF; }
+.dot.b { bottom: -2mm; left: calc(50% - 2mm); }
+.dot.t { top: -2mm; left: calc(50% - 2mm); }
+.dot.r { right: -2mm; top: calc(50% - 2mm); }
+.dot.l { left: -2mm; top: calc(50% - 2mm); }
+.keylines { display: none; position: absolute; pointer-events: none; overflow: visible; }
+.keylines line { stroke: var(--key); stroke-width: 2.2; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.matchrows .keylines { position: static; display: block; visibility: hidden; width: 100%; height: 16mm; }
+.matchcols { position: relative; display: grid; grid-template-columns: 30mm 1fr 34mm; height: 76mm; margin: 0 20mm; }
+.matchcols .col { display: flex; flex-direction: column; grid-row: 1; }
+.matchcols .left { grid-column: 1; }
+.matchcols .right { grid-column: 3; }
+.matchcols .left .mi, .matchcols .right .mi { position: relative; flex: 1; display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--line); border-radius: 3mm; margin: 1mm 0; }
+.matchcols .left .mi { margin: 3mm 0; }
+.matchcols .keylines { left: 30mm; width: calc(100% - 64mm); top: 0; height: 100%; }
+
+/* Tables */
+.tbl-print { width: 100%; border-collapse: collapse; }
+.tbl-print.narrow { width: 75%; }
+.tbl-print th { background: #A5D8FF; font-size: 11pt; padding: 1.5mm; border: 1.5px solid #4C8C2B; }
+.tbl-print td { border: 1.5px solid #4C8C2B; height: 21mm; text-align: center; padding: 1mm; }
+.tbl-print td:first-child { width: 28mm; }
+
+/* Story */
+.picnic { display: flex; justify-content: center; gap: 10mm; padding: 3mm; border-radius: 5mm; margin-bottom: 3mm;
+  background: repeating-linear-gradient(45deg, #FFE3E3 0 6mm, #FFFFFF 6mm 12mm); border: 1.5px solid #FFA8A8; }
+.picnic .fig { width: 26mm; }
+.story { margin: 0 0 2mm; }
+.qs { margin: 0; padding-left: 7mm; }
+.qs li { margin-bottom: 3mm; }
+
+/* Learn box */
+.learn { display: grid; gap: 3mm; }
+.learn-row { display: flex; align-items: center; padding: 3mm 5mm; gap: 8mm; border: 2px dashed #94D82D; border-radius: 5mm; background: #F4FCE3; }
+.anatomy { display: flex; align-items: center; gap: 3mm; }
+.anatomy .big { color: var(--accent); }
+.labels { display: flex; flex-direction: column; color: #C92A2A; font-weight: 600; }
+.learn-row .pic { width: 24mm; }
+.anatomy .big .frac { font-size: 24pt; }
+.labels { font-size: 10pt; line-height: 1.5; }
+.learn-text p { margin: 0 0 1mm; }
+.read { font-size: 12pt; }
+
+/* Yes / no, odd one out, draw */
+.claim { font-weight: 600; font-size: 11.5pt; }
+.yn span { display: inline-block; padding: .5mm 2.5mm; margin: 0 1mm; border-radius: 50%; font-weight: 700; }
+.side { flex-direction: row; justify-content: center; gap: 6mm; align-items: center; }
+.drawbox { display: flex; align-items: center; justify-content: space-between; height: 110mm; border: 1.5px dashed #868E96;
+  border-radius: 4mm; padding: 4mm 10mm; }
+.keyonly { visibility: hidden; }
+.keynote { display: none; margin: 2mm 0 0; color: var(--key); font-style: italic; font-size: 11pt; }
+
+/* ---------- Answer key ---------- */
+.key .keyband, .key .keynote { display: block; }
+.key .ans, .key .keyonly { visibility: visible; }
+.key .keylines { display: block; visibility: visible; }
+.key .yn .circ { outline: 2px solid var(--key); color: var(--key); }
+.key .circ-fig { outline: 2px solid var(--key); outline-offset: 2mm; border-radius: 50%; }
+
+.sub .fbox { margin-left: 3mm; }
+.parentnote { margin-top: 8mm; padding: 4mm 6mm; border-radius: 4mm; background: #F8F9FA; border: 1.5px solid var(--line);
+  font-size: 11pt; color: var(--muted); }
+.parentnote b { color: var(--ink); }
+.parentnote p { margin: 0 0 1.5mm; }
+.qs .blank { min-height: 6mm; vertical-align: -1mm; }

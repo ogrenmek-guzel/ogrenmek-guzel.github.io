@@ -12,6 +12,7 @@ What it checks:
       - robots.txt blocks all search engines;
       - file names are plain lower-case letters, numbers and dashes; no photos (JPEG/HEIC).
   * PDFs: the same word and path checks on their text, metadata and links.
+  * No PDF outside worksheets/ may go to GitHub (books and school documents belong in curriculum/).
 
 Private words come from tools/private-words.txt (on the Mac, never in Git) or, on GitHub,
 from the PRIVATE_WORDS secret.
@@ -267,6 +268,9 @@ def main() -> int:
             continue
         scan_name(path, words)
         if path.suffix.lower() == ".pdf":
+            if WORKSHEETS not in path.parents:
+                problem(path, "a PDF outside worksheets/ would go to GitHub: books and school "
+                              "documents belong in curriculum/ (private)")
             check_pdf(path, words)
             continue
         data = path.read_bytes()

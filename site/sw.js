@@ -1,5 +1,5 @@
 // Made by tools/build.py: do not edit.
-const CACHE = 'site-da9038fdb9e9';
+const CACHE = 'site-74ad94baf052';
 const FILES = [
   "./",
   "./app.js",
@@ -15,6 +15,15 @@ const FILES = [
   "./index.html",
   "./manifest.webmanifest",
   "./math/",
+  "./math/09-butun-yarim-ceyrek/",
+  "./math/09-butun-yarim-ceyrek/index.html",
+  "./math/09-butun-yarim-ceyrek/lesson-01-butun-yarim-ceyrek/",
+  "./math/09-butun-yarim-ceyrek/lesson-01-butun-yarim-ceyrek/draw.js",
+  "./math/09-butun-yarim-ceyrek/lesson-01-butun-yarim-ceyrek/index.html",
+  "./math/09-butun-yarim-ceyrek/lesson-01-butun-yarim-ceyrek/lesson.css",
+  "./math/09-butun-yarim-ceyrek/lesson-01-butun-yarim-ceyrek/lesson.js",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers.pdf",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek.pdf",
   "./math/index.html",
   "./robots.txt",
   "./style.css"

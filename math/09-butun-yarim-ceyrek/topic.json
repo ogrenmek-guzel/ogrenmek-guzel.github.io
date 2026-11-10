@@ -1,0 +1,17 @@
+{
+  "title": "Bütün, Yarım ve Çeyreğin Kesir Gösterimi",
+  "book": "Matematik 3 · 2. Tema · Kitap s. 86–91",
+  "items": [
+    {
+      "kind": "lesson",
+      "slug": "lesson-01-butun-yarim-ceyrek",
+      "title": "Bütün, Yarım ve Çeyrek"
+    },
+    {
+      "kind": "worksheet",
+      "slug": "worksheet-01-butun-yarim-ceyrek",
+      "title": "Bütün, Yarım ve Çeyrek (s. 86–91)",
+      "answers": true
+    }
+  ]
+}

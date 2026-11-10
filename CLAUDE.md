@@ -74,6 +74,11 @@ Private rules live in `CLAUDE.local.md` (not in Git): **read it at the start of 
 | `worksheets/` | Built PDFs: worksheets, answer keys, revision sheets, explainers, stories. **Never edit by hand.** |
 | `curriculum/` | School curriculum and her school documents, shared by the parent. **Private, git-ignored.** |
 
+**Books and school documents always go in `curriculum/`** (`curriculum/math/`, `curriculum/english/school/`,
+`curriculum/english/private/`), never in `math/` or `english/`: those folders go to the public GitHub
+repository. `tools/check.py` stops a publish if any PDF outside `worksheets/` would go to GitHub.
+The Math book is `curriculum/math/matematik3-1.pdf` (printed page number = PDF page number − 1).
+
 ## Decisions
 - **Math is 100% Turkish** for now: all text, buttons, feedback ("Aferin!", "Tekrar dene"), PDF titles.
   Pages use `lang="tr"` (so capital letters of i/ı come out right: i → İ, ı → I).
@@ -87,6 +92,11 @@ Private rules live in `CLAUDE.local.md` (not in Git): **read it at the start of 
 - **PDFs are also on the website**, organised by subject and topic, mirroring the iMac folders.
   **Answer keys are on both the iMac and the website**; on each topic page they are listed in a
   separate "For parents" section at the bottom ("Veli için" on math pages), not next to the worksheets.
+- **Math topic numbers follow the book**: the number is the topic's position in the book's table of contents
+  (Unit 1 has topics 01-08, so Unit 2's first topic is `09-…`), so later topics slot into the right place.
+  Every question in a Math lesson or sheet shows the **book page** it follows ("Kitap s. 87"), in book order;
+  questions are similar to the book's but never copies; pictures are our own drawings (the book is copyrighted).
+  A few **"Düşünelim ★ / Yeni tarz"** questions at the end test a new question style.
 - **File and folder names**: lower-case ASCII, words joined by `-`, numbered in curriculum order
   (e.g. `01-dogal-sayilar`). No Turkish letters or spaces in names (they break web addresses);
   the real Turkish titles are shown on the pages.
@@ -137,6 +147,10 @@ worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
 - **PDF rule**: always print with Chrome's `--no-pdf-header-footer`. Without it Chrome prints the
   local file path and date on every page; the check catches this (tested), but never rely on that.
   Chrome sets only Title (from `<title>`), Creator (browser) and Producer (Skia) as metadata.
+- `python3 tools/make_pdf.py [item folder]`: prints PDF items with headless Chrome (fresh temporary profile,
+  `--no-pdf-header-footer`). Source: `<topic>/<slug>/print.html` (A4 pages, may use a lesson's `draw.js`).
+  Output: `worksheets/<section>/<topic>/<slug>.pdf`, plus `<slug>-answers.pdf` (same page opened with
+  `?answers`, which shows the answers) when the item has `"answers": true`. No argument = every PDF item.
 - `python3 tools/make_icons.py`: makes `_shared/icons/*.png` from `_shared/icon.svg` with headless Chrome.
 - `python3 tools/publish.py "message"`: build, check, commit, push. Stops at the first problem and
   refuses to commit unless Git uses the noreply email. **Draft files stay on the iMac** (excluded from
@@ -144,7 +158,8 @@ worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
   `--dry-run` lists what would be uploaded without changing anything.
 - Preview: run `python3 tools/build.py --preview`, then `.claude/launch.json` config `site-preview`
   serves `_preview/` on http://localhost:8765 (the service worker only runs on https, so previews
-  are never stale). Both chats share this preview server.
+  are never stale). The English chat uses `site-preview`; the Math chat uses `site-preview-math`
+  (http://localhost:8767), both serving the same `_preview/` folder.
 - Page rules: no inline scripts or `on…=` handlers (the content security policy blocks them);
   put code in `lesson.js`. Tap to hear: any element with `data-say` is read aloud (`_shared/app.js`).
 - Publishing on GitHub: `.github/workflows/pages.yml` runs `tools/check.py --ci` and then publishes
@@ -190,8 +205,9 @@ worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
 - [x] Decided: American spelling and pronunciation; tap-to-hear in English; answer keys on iMac and website.
 - [ ] Waiting for: curriculum documents in `curriculum/`.
 - [x] GitHub account, repository and deploy key set up; connection tested.
-- [x] Template, home page, icons, build, check and publish scripts (PDF script still to come).
+- [x] Template, home page, icons, build, check and publish scripts; PDF script `tools/make_pdf.py`.
 - [x] GitHub Pages switched to "GitHub Actions"; first version live at https://ogrenmek-guzel.github.io/
       (workflow and safety check passed on GitHub; offline cache confirmed; project files not served).
 - [ ] Parent adds the site to the iPad Home Screen.
-- [ ] First lesson.
+- [x] First Math lesson: `math/09-butun-yarim-ceyrek` (book Unit 2, p. 86-91): iPad lesson (14 steps) and
+      7-page worksheet with answer key: approved and published.
