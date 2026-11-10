@@ -312,7 +312,9 @@ def build_static() -> None:
 
 def build_service_worker() -> None:
     """Offline support: every page, style, script, icon and PDF (worksheets, answer keys, explainers,
-    stories made by us) is saved on the iPad on the first visit. A new version replaces the old copy."""
+    stories made by us) is saved on the iPad on the first visit. A new version replaces the old copy.
+    The copy is always fetched fresh from the internet (cache 'reload'): GitHub lets browsers keep pages
+    for 10 minutes, and saving from that store once put an older page into a newer version's copy."""
     urls, digest = ["./"], hashlib.sha256()
     for rel in sorted(written):
         if rel in (".nojekyll", "404.html"):
@@ -327,7 +329,9 @@ const CACHE = 'site-{version}';
 const FILES = {json.dumps(sorted(set(urls)), indent=2)};
 
 self.addEventListener('install', (event) => {{
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE)
+    .then((c) => c.addAll(FILES.map((u) => new Request(u, {{ cache: 'reload' }}))))
+    .then(() => self.skipWaiting()));
 }});
 
 self.addEventListener('activate', (event) => {{
@@ -345,7 +349,7 @@ self.addEventListener('fetch', (event) => {{
     const hit = await cache.match(req, {{ ignoreSearch: true }});
     if (hit) return hit;
     try {{
-      const res = await fetch(req);
+      const res = await fetch(req.url, {{ cache: 'no-cache' }});
       if (res.ok && !res.redirected) cache.put(req, res.clone());
       return res;
     }} catch (err) {{

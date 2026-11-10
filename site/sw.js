@@ -35,7 +35,9 @@ const FILES = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE)
+    .then((c) => c.addAll(FILES.map((u) => new Request(u, { cache: 'reload' }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {
@@ -53,7 +55,7 @@ self.addEventListener('fetch', (event) => {
     const hit = await cache.match(req, { ignoreSearch: true });
     if (hit) return hit;
     try {
-      const res = await fetch(req);
+      const res = await fetch(req.url, { cache: 'no-cache' });
       if (res.ok && !res.redirected) cache.put(req, res.clone());
       return res;
     } catch (err) {
