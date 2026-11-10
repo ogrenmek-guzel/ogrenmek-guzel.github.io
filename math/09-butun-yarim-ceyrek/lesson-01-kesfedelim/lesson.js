@@ -178,15 +178,20 @@
                   openAll();
                   svg.querySelector('.fold.h').classList.remove('gone');
                   cap.innerHTML = 'İki katlama çizgisi kâğıdı <b>dört eş parçaya</b> böldü. <b>Bir parçaya dokun</b> ve boya!';
-                  each(svg.querySelectorAll('.paper'), function (p) {
-                    p.classList.add('tap');
-                    p.addEventListener('click', function () {
-                      each(svg.querySelectorAll('.paper'), function (x) { x.classList.remove('on'); });
-                      p.classList.add('on');
-                      cap.innerHTML = 'Dört eş parçadan <b>birini</b> boyadın. Boyalı parça bir <b>çeyrek</b>.';
-                      done();
+                  // The tap is read from the touch position on the whole picture (reliable on the iPad,
+                  // even while parts are moving), and "Devam" is shown now so she can never get stuck.
+                  art.classList.add('tapzone');
+                  art.addEventListener('click', function (e) {
+                    var r = svg.getBoundingClientRect();
+                    var x = (e.clientX - r.left) / r.width * 100, y = (e.clientY - r.top) / r.height * 100;
+                    if (x < 5 || x > 95 || y < 5 || y > 95) return;
+                    var k = (y < 50 ? 'T' : 'B') + (x < 50 ? 'L' : 'R');
+                    each(svg.querySelectorAll('.paper'), function (p) {
+                      p.classList.toggle('on', p.getAttribute('data-k') === k);
                     });
+                    cap.innerHTML = 'Dört eş parçadan <b>birini</b> boyadın. Boyalı parça bir <b>çeyrek</b>.';
                   });
+                  done();
                 });
               });
             });

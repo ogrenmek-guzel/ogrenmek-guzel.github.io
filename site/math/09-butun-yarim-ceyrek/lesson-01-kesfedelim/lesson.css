@@ -116,3 +116,4 @@
   .sums { grid-template-columns: 1fr; }
   .cap { font-size: 21px; }
 }
+.tapzone { cursor: pointer; }
