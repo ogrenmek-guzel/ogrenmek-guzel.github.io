@@ -1,10 +1,14 @@
 // Made by tools/build.py: do not edit.
-const CACHE = 'site-ee31974a92b3';
+const CACHE = 'site-da9038fdb9e9';
 const FILES = [
   "./",
   "./app.js",
   "./english/",
   "./english/index.html",
+  "./english/private/",
+  "./english/private/index.html",
+  "./english/school/",
+  "./english/school/index.html",
   "./icons/icon-180.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

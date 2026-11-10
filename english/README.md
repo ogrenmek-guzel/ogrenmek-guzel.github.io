@@ -1,3 +1,5 @@
 # english
 
-English lesson sources. One folder per topic, for example `english/word-families/`.
+English has two separate paths:
+- `school/`: her school English
+- `private/`: her private English lessons (different books)

@@ -62,7 +62,8 @@ Private rules live in `CLAUDE.local.md` (not in Git): **read it at the start of 
 | `CLAUDE.local.md` | Private notes and rules (git-ignored). |
 | `START-HERE.md` | Short map of the folders for the parent. |
 | `_shared/` | Page template, shared CSS and JS, fonts (open licence only). |
-| `math/`, `english/` | Lesson sources, one folder per topic (e.g. `math/multiplication-arrays/`). |
+| `math/` | Math lesson sources, one folder per topic (e.g. `math/03-toplama-islemi/`). |
+| `english/school/`, `english/private/` | English lesson sources for the two English paths, one folder per unit/topic. |
 | `tools/` | Build, check, PDF and publish scripts (Python 3, standard library only; no Node on this Mac). |
 | `site/` | Built website that is published. **Never edit by hand.** |
 | `worksheets/` | Built PDFs: worksheets, answer keys, revision sheets, explainers, stories. **Never edit by hand.** |
@@ -85,6 +86,18 @@ Private rules live in `CLAUDE.local.md` (not in Git): **read it at the start of 
   (e.g. `01-dogal-sayilar`). No Turkish letters or spaces in names (they break web addresses);
   the real Turkish titles are shown on the pages.
 
+## English has two separate paths (decided)
+- **School English** (`english/school/`): follows her school English book.
+- **Private Lessons** (`english/private/`): follows her private English lessons, which use different
+  books and are **not related** to school.
+- Each path has its own topics (units), lessons, PDFs and answer keys, numbered in the order the
+  parent gives. Always ask which path a new English item belongs to if it is not clear.
+- A topic may name its book (`"book"` in topic.json, shown small above the title): use the book
+  title only, never a school, teacher or course-provider name.
+- Website: English → two big buttons (School English, Private Lessons) → topics → lessons/PDFs.
+  Same layout in `worksheets/english/school/…` and `worksheets/english/private/…`, and the parent's
+  documents go in `curriculum/english/school/` and `curriculum/english/private/`.
+
 ## How everything is organised (same on the iMac and the website)
 Subject, then topic (numbered in the school's order), then the material for that topic.
 ```
@@ -99,8 +112,9 @@ site/math/03-toplama-islemi/       <- built website (never edit by hand)
 worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
   worksheet-01-….pdf   worksheet-01-…-answers.pdf
 ```
-- Home page: two big buttons, **Matematik** and **English**. Each opens the subject page, which lists
-  the topics in order; each topic page lists its activities first, then its PDFs.
+- Home page: two big buttons, **Matematik** and **English**. Matematik lists its topics in order;
+  English first shows its two paths, and each path lists its topics. Each topic page lists its
+  activities first, then its PDFs, then the answer keys for parents.
 - PDF kinds: `worksheet` (practice + answer key), `revision` (revision sheet / homework),
   `explainer` (1-2 page visual explanation), `story` (English short story).
 

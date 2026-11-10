@@ -8,13 +8,18 @@ Uses only Python's standard library. The output folder is deleted and rebuilt ev
 Drafts: add "draft": true to an item (or to the whole topic) in topic.json. Drafts appear only in the
 preview, never on the website, and tools/publish.py keeps their files on the iMac until approved.
 
+Sections: Math topics sit directly in math/. English has two separate paths, each with its own topics:
+english/school/ (her school English) and english/private/ (her private lessons, different books).
+Below, <section> means math, english/school or english/private.
+
 Lesson sources:
-  <subject>/<NN-topic>/topic.json
+  <section>/<NN-topic>/topic.json
       {"title": "Toplama İşlemi",
+       "book": "optional: book name, shown small above the topic title",
        "items": [{"kind": "lesson",    "slug": "lesson-01-...",    "title": "..."},
                  {"kind": "worksheet", "slug": "worksheet-01-...", "title": "...", "answers": true}]}
-  <subject>/<NN-topic>/<lesson-slug>/lesson.html   (page content; lesson.css / lesson.js optional)
-PDF kinds (worksheet, revision, explainer, story) are taken from worksheets/<subject>/<topic>/<slug>.pdf
+  <section>/<NN-topic>/<lesson-slug>/lesson.html   (page content; lesson.css / lesson.js optional)
+PDF kinds (worksheet, revision, explainer, story) are taken from worksheets/<section>/<topic>/<slug>.pdf
 and their answer keys from <slug>-answers.pdf.
 """
 from __future__ import annotations
@@ -55,6 +60,11 @@ SUBJECTS = {
         "kinds": {"worksheet": "Worksheet", "revision": "Revision", "explainer": "Explainer",
                   "story": "Story"},
         "lesson_tag": "Start", "draft": "DRAFT",
+        # Two separate paths, each with its own topics, books, PDFs and answer keys.
+        "paths": [
+            {"slug": "school", "title": "School English", "icon": "school", "color": "#D9480F"},
+            {"slug": "private", "title": "Private Lessons", "icon": "star", "color": "#0B7A75"},
+        ],
     },
 }
 
@@ -72,6 +82,19 @@ ENGLISH_ICON = (
     '<text x="60" y="65" text-anchor="middle" font-size="30" font-weight="700" fill="#D9480F" '
     'font-family="Avenir Next, Avenir, sans-serif">ABC</text></svg>'
 )
+PATH_ICONS = {
+    "school": (
+        '<svg viewBox="0 0 120 120" aria-hidden="true"><g fill="#fff">'
+        '<path d="M60 12l46 28v8H14v-8z"/><rect x="22" y="52" width="76" height="44"/>'
+        '<rect x="12" y="96" width="96" height="9" rx="3"/></g><g fill="{color}">'
+        '<rect x="52" y="70" width="16" height="26" rx="2"/><rect x="31" y="60" width="14" height="13" rx="2"/>'
+        '<rect x="75" y="60" width="14" height="13" rx="2"/></g></svg>'
+    ),
+    "star": (
+        '<svg viewBox="0 0 120 120" aria-hidden="true"><polygon fill="#fff" points="60,16 71.2,46.6 '
+        '103.7,47.8 78.1,67.9 87,99.2 60,81 33,99.2 41.9,67.9 16.3,47.8 48.8,46.6"/></svg>'
+    ),
+}
 
 TEMPLATE = (SHARED / "template.html").read_text(encoding="utf-8")
 written: list[str] = []
@@ -120,9 +143,11 @@ def page(rel: str, *, lang: str, title: str, content: str, body_class: str = "",
     write(rel, text.replace("{{root}}", root))
 
 
-def load_topics(subject: str) -> list[dict]:
+def load_topics(section: str) -> list[dict]:
     topics = []
-    folder = ROOT / subject
+    folder = ROOT / section
+    if not folder.is_dir():
+        return topics
     for d in sorted(p for p in folder.iterdir() if p.is_dir()):
         meta = d / "topic.json"
         if not meta.exists():
@@ -130,12 +155,12 @@ def load_topics(subject: str) -> list[dict]:
         data = json.loads(meta.read_text(encoding="utf-8"))
         data["slug"], data["dir"] = d.name, d
         if data.get("draft") and not INCLUDE_DRAFTS:
-            left_out.append(f"{subject}/{d.name} (whole topic)")
+            left_out.append(f"{section}/{d.name} (whole topic)")
             continue
         items = []
         for item in data.get("items", []):
             if item.get("draft") and not INCLUDE_DRAFTS:
-                left_out.append(f"{subject}/{d.name}/{item.get('slug')}")
+                left_out.append(f"{section}/{d.name}/{item.get('slug')}")
             else:
                 items.append(item)
         data["items"] = items
@@ -157,31 +182,52 @@ def build_home() -> None:
 
 def build_subject(subject: str) -> None:
     t = SUBJECTS[subject]
-    topics = load_topics(subject)
-    if topics:
-        rows = "\n".join(
-            f'  <li><a class="tile" href="{esc(tp["slug"])}/"><span class="num">{i}</span>'
-            f'<span class="tile-text">{esc(tp["title"])}</span>{draft_tag(subject, tp)}</a></li>'
-            for i, tp in enumerate(topics, start=1)
-        )
-        body = f'<h2>{esc(t["topics"])}</h2>\n<ul class="list">\n{rows}\n</ul>'
-    else:
-        body = f'<p class="empty">{esc(t["empty"])}</p>'
+    paths = t.get("paths")
+    if not paths:
+        build_section(subject, subject, t["title"], t["home"])
+        return
+    # A subject with paths (English): its page shows one big button per path.
+    buttons = "\n".join(
+        f'  <a class="subject subject-path" style="background:{p["color"]}" href="{p["slug"]}/">'
+        f'{PATH_ICONS[p["icon"]].replace("{color}", p["color"])}<span>{esc(p["title"])}</span></a>'
+        for p in paths
+    )
     page(f"{subject}/index.html", lang=t["lang"], title=f'{t["title"]} · {APP_NAME}',
          body_class=f"subject-page-{subject}", nav=back("../", t["home"]),
-         content=f'<h1>{esc(t["title"])}</h1>\n{body}')
+         content=f'<h1>{esc(t["title"])}</h1>\n<nav class="subjects paths">\n{buttons}\n</nav>')
+    for p in paths:
+        build_section(subject, f'{subject}/{p["slug"]}', p["title"], t["title"])
+
+
+def build_section(subject: str, section: str, title: str, back_label: str) -> None:
+    """A list of topics: the Math page, or one English path."""
+    t = SUBJECTS[subject]
+    topics = load_topics(section)
+    if topics:
+        rows = []
+        for i, tp in enumerate(topics, start=1):
+            book = f'<span class="kind">{esc(tp["book"])}</span>' if tp.get("book") else ""
+            rows.append(
+                f'  <li><a class="tile" href="{esc(tp["slug"])}/"><span class="num">{i}</span>'
+                f'<span class="tile-text">{book}{esc(tp["title"])}</span>{draft_tag(subject, tp)}</a></li>')
+        body = f'<h2>{esc(t["topics"])}</h2>\n<ul class="list">\n' + "\n".join(rows) + "\n</ul>"
+    else:
+        body = f'<p class="empty">{esc(t["empty"])}</p>'
+    page(f"{section}/index.html", lang=t["lang"], title=f'{title} · {APP_NAME}',
+         body_class=f"subject-page-{subject}", nav=back("../", back_label),
+         content=f'<h1>{esc(title)}</h1>\n{body}')
     for tp in topics:
-        build_topic(subject, tp)
+        build_topic(subject, section, title, tp)
 
 
-def build_lesson(subject: str, topic: dict, item: dict) -> bool:
+def build_lesson(subject: str, section: str, topic: dict, item: dict) -> bool:
     t = SUBJECTS[subject]
     src = topic["dir"] / item["slug"]
     frag = src / "lesson.html"
     if not frag.exists():
-        warnings.append(f"{subject}/{topic['slug']}/{item['slug']}: lesson.html is missing, skipped")
+        warnings.append(f"{section}/{topic['slug']}/{item['slug']}: lesson.html is missing, skipped")
         return False
-    base = f"{subject}/{topic['slug']}/{item['slug']}/"
+    base = f"{section}/{topic['slug']}/{item['slug']}/"
     for f in sorted(src.rglob("*")):
         if f.is_file() and f.name not in SKIP_IN_LESSON:
             copy(f, base + f.relative_to(src).as_posix())
@@ -194,30 +240,30 @@ def build_lesson(subject: str, topic: dict, item: dict) -> bool:
     return True
 
 
-def build_topic(subject: str, topic: dict) -> None:
+def build_topic(subject: str, section: str, section_title: str, topic: dict) -> None:
     t = SUBJECTS[subject]
     lessons, pdfs, answers = [], [], []
     for item in topic["items"]:
         kind = item.get("kind")
         if kind == "lesson":
-            if build_lesson(subject, topic, item):
+            if build_lesson(subject, section, topic, item):
                 lessons.append(
                     f'  <li><a class="tile" href="{esc(item["slug"])}/"><span class="tile-text">'
                     f'{esc(item["title"])}</span>{draft_tag(subject, item)}'
                     f'<span class="tag">{esc(t["lesson_tag"])}</span></a></li>')
         elif kind in PDF_KINDS:
-            pdf = WORKSHEETS / subject / topic["slug"] / f'{item["slug"]}.pdf'
+            pdf = WORKSHEETS / section / topic["slug"] / f'{item["slug"]}.pdf'
             if not pdf.exists():
                 warnings.append(f"{pdf.relative_to(ROOT)} is missing, not listed")
                 continue
-            copy(pdf, f'{subject}/{topic["slug"]}/pdf/{pdf.name}')
+            copy(pdf, f'{section}/{topic["slug"]}/pdf/{pdf.name}')
             pdfs.append(
                 f'  <li><a class="tile" href="pdf/{esc(pdf.name)}"><span class="tile-text">'
                 f'<span class="kind">{esc(t["kinds"][kind])}</span>{esc(item["title"])}</span>'
                 f'{draft_tag(subject, item)}<span class="tag">PDF</span></a></li>')
             key = pdf.with_name(f'{item["slug"]}-answers.pdf')
             if key.exists():
-                copy(key, f'{subject}/{topic["slug"]}/pdf/{key.name}')
+                copy(key, f'{section}/{topic["slug"]}/pdf/{key.name}')
                 answers.append(
                     f'  <li><a class="tile" href="pdf/{esc(key.name)}"><span class="tile-text">'
                     f'<span class="kind">{esc(t["answers"])}</span>{esc(item["title"])}</span>'
@@ -225,9 +271,10 @@ def build_topic(subject: str, topic: dict) -> None:
             elif item.get("answers"):
                 warnings.append(f"{key.relative_to(ROOT)} is missing, not listed")
         else:
-            warnings.append(f"{subject}/{topic['slug']}: unknown item kind {kind!r}, skipped")
+            warnings.append(f"{section}/{topic['slug']}: unknown item kind {kind!r}, skipped")
 
-    parts = [f'<h1>{esc(topic["title"])}</h1>']
+    book = f'<p class="book">{esc(topic["book"])}</p>\n' if topic.get("book") else ""
+    parts = [f'{book}<h1>{esc(topic["title"])}</h1>']
     if lessons:
         parts.append(f'<h2>{esc(t["activities"])}</h2>\n<ul class="list">\n' + "\n".join(lessons) + "\n</ul>")
     if pdfs:
@@ -237,9 +284,9 @@ def build_topic(subject: str, topic: dict) -> None:
     if answers:
         parts.append(f'<section class="parents">\n<h2>{esc(t["parents"])}</h2>\n<ul class="list">\n'
                      + "\n".join(answers) + "\n</ul>\n</section>")
-    page(f'{subject}/{topic["slug"]}/index.html', lang=t["lang"],
+    page(f'{section}/{topic["slug"]}/index.html', lang=t["lang"],
          title=f'{topic["title"]} · {APP_NAME}', body_class=f"subject-page-{subject}",
-         nav=back("../", t["title"]), content="\n".join(parts))
+         nav=back("../", section_title), content="\n".join(parts))
 
 
 def build_static() -> None:

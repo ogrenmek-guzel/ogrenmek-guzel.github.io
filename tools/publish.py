@@ -34,10 +34,11 @@ def draft_paths() -> list[Path]:
     """Files and folders that belong to drafts: kept out of Git until the draft mark is removed."""
     paths: list[Path] = []
     for subject in SUBJECTS:
-        for meta in sorted((ROOT / subject).glob("*/topic.json")):
+        # math/<topic>/topic.json and english/<path>/<topic>/topic.json
+        for meta in sorted((ROOT / subject).rglob("topic.json")):
             data = json.loads(meta.read_text(encoding="utf-8"))
             topic = meta.parent
-            pdf_dir = ROOT / "worksheets" / subject / topic.name
+            pdf_dir = ROOT / "worksheets" / topic.relative_to(ROOT)
             if data.get("draft"):
                 paths += [topic, pdf_dir]
                 continue

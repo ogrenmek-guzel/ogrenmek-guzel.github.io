@@ -7,12 +7,15 @@ A short map of this project. You never need to edit these files yourself: just a
 - **START-HERE.md**: this page.
 - **_shared/**: the parts every lesson shares (page design, colours, buttons, fonts).
 - **math/**: the Math lessons, one folder per topic.
-- **english/**: the English lessons, one folder per topic.
+- **english/**: the English lessons, in two separate paths:
+  - **english/school/**: School English (her school book);
+  - **english/private/**: Private Lessons (her private lesson books).
 - **tools/**: the scripts Claude runs to build, check, print and publish.
 - **site/**: the finished website that goes online. Built automatically: never edit it by hand.
 - **worksheets/**: the finished printable PDFs (worksheets, answer keys, revision sheets, explainers,
   stories). Built automatically.
-- **curriculum/**: put the school curriculum and her school documents here (photos, PDFs, scans).
+- **curriculum/**: put her books and documents here (photos, PDFs, scans), in the right sub-folder:
+  `curriculum/math/`, `curriculum/english/school/` or `curriculum/english/private/`.
   This folder is **private**: it never goes to GitHub.
 
 ## How things are organised
