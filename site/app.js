@@ -23,6 +23,11 @@
     if (voices.length) u.voice = voices[0];
     window.speechSynthesis.speak(u);
   };
+  // Print button on PDF pages: prints just the pages (the button and back button are hidden).
+  document.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('[data-print]')) window.print();
+  });
+
   document.addEventListener('click', function (e) {
     var el = e.target.closest ? e.target.closest('[data-say]') : null;
     if (!el) return;

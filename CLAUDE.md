@@ -151,6 +151,14 @@ worksheets/math/03-toplama-islemi/ <- built PDFs on the iMac (same names)
   `--no-pdf-header-footer`). Source: `<topic>/<slug>/print.html` (A4 pages, may use a lesson's `draw.js`).
   Output: `worksheets/<section>/<topic>/<slug>.pdf`, plus `<slug>-answers.pdf` (same page opened with
   `?answers`, which shows the answers) when the item has `"answers": true`. No argument = every PDF item.
+- **PDFs open inside the app** (decided after the parent found the iPad trap: a PDF opened directly in
+  the Home Screen app fills the screen with no way back). `build.py` gives every PDF its own page
+  `pdf/<slug>/` with a back button, a print button (`data-print` in `_shared/app.js`) and pictures of
+  each page (`tools/pdf_pages.swift`, macOS PDFKit, 1400 px wide, compiled and cached in `_cache/`,
+  git-ignored; redone only when the PDF changes). Topic pages link to these pages, never to the .pdf.
+  The .pdf files stay on the site but are not in the offline copy (the page pictures are).
+  Tested: all pages load, back works, printing gives one picture per A4 page.
+  If `swiftc` is missing (e.g. a cloud session), the build warns and links the .pdf directly.
 - `python3 tools/make_icons.py`: makes `_shared/icons/*.png` from `_shared/icon.svg` with headless Chrome.
 - `python3 tools/publish.py "message"`: build, check, commit, push. Stops at the first problem and
   refuses to commit unless Git uses the noreply email. **Draft files stay on the iMac** (excluded from

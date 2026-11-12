@@ -1,5 +1,5 @@
 // Made by tools/build.py: do not edit.
-const CACHE = 'site-0f2a410938cd';
+const CACHE = 'site-ad1bdae67baf';
 const FILES = [
   "./",
   "./app.js",
@@ -26,9 +26,28 @@ const FILES = [
   "./math/09-butun-yarim-ceyrek/lesson-02-alistirmalar/index.html",
   "./math/09-butun-yarim-ceyrek/lesson-02-alistirmalar/lesson.css",
   "./math/09-butun-yarim-ceyrek/lesson-02-alistirmalar/lesson.js",
-  "./math/09-butun-yarim-ceyrek/pdf/explainer-01-butun-yarim-ceyrek.pdf",
-  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers.pdf",
-  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek.pdf",
+  "./math/09-butun-yarim-ceyrek/pdf/explainer-01-butun-yarim-ceyrek/",
+  "./math/09-butun-yarim-ceyrek/pdf/explainer-01-butun-yarim-ceyrek/index.html",
+  "./math/09-butun-yarim-ceyrek/pdf/explainer-01-butun-yarim-ceyrek/page-1.png",
+  "./math/09-butun-yarim-ceyrek/pdf/explainer-01-butun-yarim-ceyrek/page-2.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers/",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers/index.html",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers/page-1.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers/page-2.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers/page-3.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers/page-4.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers/page-5.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers/page-6.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek-answers/page-7.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek/",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek/index.html",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek/page-1.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek/page-2.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek/page-3.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek/page-4.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek/page-5.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek/page-6.png",
+  "./math/09-butun-yarim-ceyrek/pdf/worksheet-01-butun-yarim-ceyrek/page-7.png",
   "./math/index.html",
   "./robots.txt",
   "./style.css"

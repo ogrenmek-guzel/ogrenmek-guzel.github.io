@@ -109,9 +109,32 @@ h2 { font-size: 26px; margin: 36px 0 14px; font-weight: 700; }
 .parents h2 { font-size: 20px; color: var(--muted); }
 .parents .tile { min-height: 60px; font-size: 18px; }
 
+/* PDFs shown inside the app: page pictures, a back button and a print button */
+.pdf-actions { display: flex; justify-content: flex-end; margin: 0 0 16px; }
+.print-button {
+  min-height: 56px; padding: 0 28px; border: 0; border-radius: 999px;
+  background: var(--accent); color: #FFFFFF; font: inherit; font-weight: 700;
+  box-shadow: var(--shadow); cursor: pointer;
+}
+.print-button:active { transform: translateY(2px); box-shadow: none; }
+.pdf-pages { display: grid; gap: 18px; }
+.pdf-pages img {
+  display: block; width: 100%; height: auto; background: #FFFFFF;
+  border-radius: 6px; box-shadow: 0 2px 12px rgba(31, 41, 55, .14);
+}
+
 :focus-visible { outline: 4px solid var(--accent); outline-offset: 3px; }
 
 @media print {
+  @page { size: A4; margin: 0; }
   body { background: #FFFFFF; padding: 0; }
   .topbar { display: none; }
+  .pdf-page h1, .pdf-actions { display: none; }
+  .pdf-page main { max-width: none; }
+  .pdf-pages { display: block; }
+  .pdf-pages img {
+    width: 100%; height: auto; max-height: 100vh; object-fit: contain;
+    border-radius: 0; box-shadow: none; break-after: page; page-break-after: always;
+  }
+  .pdf-pages img:last-child { break-after: auto; page-break-after: auto; }
 }

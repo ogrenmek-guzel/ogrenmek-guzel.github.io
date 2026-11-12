@@ -28,6 +28,7 @@ import hashlib
 import html
 import json
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -38,6 +39,8 @@ PREVIEW = ROOT / "_preview"
 OUT = SITE
 INCLUDE_DRAFTS = False
 WORKSHEETS = ROOT / "worksheets"
+CACHE = ROOT / "_cache"
+PAGE_WIDTH = 1400  # pixels; pictures of PDF pages shown inside the app
 
 APP_NAME = "Öğrenmek Güzel"
 BG = "#FFF8EE"
@@ -51,7 +54,7 @@ SUBJECTS = {
         "pdfs": "Yazdırılabilir sayfalar", "parents": "Veli için", "answers": "Cevap anahtarı",
         "kinds": {"worksheet": "Çalışma kâğıdı", "revision": "Tekrar", "explainer": "Konu anlatımı",
                   "story": "Hikâye"},
-        "lesson_tag": "Başla", "draft": "TASLAK",
+        "lesson_tag": "Başla", "draft": "TASLAK", "print": "Yazdır", "page_word": "Sayfa",
     },
     "english": {
         "lang": "en-US", "title": "English", "home": "Home", "topics": "Topics",
@@ -59,7 +62,7 @@ SUBJECTS = {
         "pdfs": "Printable pages", "parents": "For parents", "answers": "Answer key",
         "kinds": {"worksheet": "Worksheet", "revision": "Revision", "explainer": "Explainer",
                   "story": "Story"},
-        "lesson_tag": "Start", "draft": "DRAFT",
+        "lesson_tag": "Start", "draft": "DRAFT", "print": "Print", "page_word": "Page",
         # Two separate paths, each with its own topics, books, PDFs and answer keys.
         "paths": [
             {"slug": "school", "title": "School English", "icon": "school", "color": "#D9480F"},
@@ -240,6 +243,49 @@ def build_lesson(subject: str, section: str, topic: dict, item: dict) -> bool:
     return True
 
 
+def pdf_pictures(pdf: Path) -> list[Path]:
+    """PNG pictures of each page of a PDF, made with macOS's PDF engine (tools/pdf_pages.swift).
+    Kept in _cache/ (git-ignored) and only redone when the PDF changes. [] if not possible."""
+    tool = CACHE / "pdf_pages"
+    source = ROOT / "tools" / "pdf_pages.swift"
+    if not tool.exists() or tool.stat().st_mtime < source.stat().st_mtime:
+        if not shutil.which("swiftc"):
+            return []
+        CACHE.mkdir(exist_ok=True)
+        subprocess.run(["swiftc", "-O", str(source), "-o", str(tool)], check=True, capture_output=True)
+    digest = hashlib.sha256(pdf.read_bytes()).hexdigest()[:16]
+    folder = CACHE / "pages" / f"{digest}-{PAGE_WIDTH}"
+    pages = sorted(folder.glob("page-*.png"), key=lambda p: int(p.stem.split("-")[1])) if folder.exists() else []
+    if not pages:
+        subprocess.run([str(tool), str(pdf), str(folder), str(PAGE_WIDTH)], check=True, capture_output=True)
+        pages = sorted(folder.glob("page-*.png"), key=lambda p: int(p.stem.split("-")[1]))
+    return pages
+
+
+def pdf_page(subject: str, section: str, topic: dict, pdf: Path, title: str) -> str:
+    """Publish a PDF and a page that shows it inside the app (page pictures, a back button and a
+    print button). On the iPad a PDF opened directly fills the screen with no way back, so the topic
+    page links to this page instead. Returns the link to use on the topic page."""
+    base = f'{section}/{topic["slug"]}/pdf/'
+    copy(pdf, base + pdf.name)
+    pages = pdf_pictures(pdf)
+    if not pages:
+        warnings.append(f"{pdf.relative_to(ROOT)}: could not make page pictures, linking the PDF directly")
+        return f"pdf/{pdf.name}"
+    t = SUBJECTS[subject]
+    folder = base + pdf.stem + "/"
+    imgs = []
+    for i, png in enumerate(pages, start=1):
+        copy(png, f"{folder}{png.name}")
+        imgs.append(f'<img src="{png.name}" alt="{esc(t["page_word"])} {i}" width="{PAGE_WIDTH}" '
+                    f'height="{round(PAGE_WIDTH * 297 / 210)}" decoding="async">')
+    content = (f'<h1>{esc(title)}</h1>\n<div class="pdf-actions"><button class="print-button" type="button" '
+               f'data-print>{esc(t["print"])}</button></div>\n<div class="pdf-pages">\n' + "\n".join(imgs) + "\n</div>")
+    page(folder + "index.html", lang=t["lang"], title=f"{title} · {APP_NAME}",
+         body_class=f"subject-page-{subject} pdf-page", nav=back("../../", topic["title"]), content=content)
+    return f"pdf/{pdf.stem}/"
+
+
 def build_topic(subject: str, section: str, section_title: str, topic: dict) -> None:
     t = SUBJECTS[subject]
     lessons, pdfs, answers = [], [], []
@@ -256,16 +302,16 @@ def build_topic(subject: str, section: str, section_title: str, topic: dict) -> 
             if not pdf.exists():
                 warnings.append(f"{pdf.relative_to(ROOT)} is missing, not listed")
                 continue
-            copy(pdf, f'{section}/{topic["slug"]}/pdf/{pdf.name}')
+            href = pdf_page(subject, section, topic, pdf, f'{t["kinds"][kind]}: {item["title"]}')
             pdfs.append(
-                f'  <li><a class="tile" href="pdf/{esc(pdf.name)}"><span class="tile-text">'
+                f'  <li><a class="tile" href="{esc(href)}"><span class="tile-text">'
                 f'<span class="kind">{esc(t["kinds"][kind])}</span>{esc(item["title"])}</span>'
                 f'{draft_tag(subject, item)}<span class="tag">PDF</span></a></li>')
             key = pdf.with_name(f'{item["slug"]}-answers.pdf')
             if key.exists():
-                copy(key, f'{section}/{topic["slug"]}/pdf/{key.name}')
+                href = pdf_page(subject, section, topic, key, f'{t["answers"]}: {item["title"]}')
                 answers.append(
-                    f'  <li><a class="tile" href="pdf/{esc(key.name)}"><span class="tile-text">'
+                    f'  <li><a class="tile" href="{esc(href)}"><span class="tile-text">'
                     f'<span class="kind">{esc(t["answers"])}</span>{esc(item["title"])}</span>'
                     f'<span class="tag">PDF</span></a></li>')
             elif item.get("answers"):
@@ -311,13 +357,14 @@ def build_static() -> None:
 
 
 def build_service_worker() -> None:
-    """Offline support: every page, style, script, icon and PDF (worksheets, answer keys, explainers,
-    stories made by us) is saved on the iPad on the first visit. A new version replaces the old copy.
+    """Offline support: every page, style, script, icon and every PDF we make (worksheets, answer keys,
+    explainers, stories) is saved on the iPad on the first visit. PDFs are saved as their in-app pages
+    (page pictures), which is how the app shows them; the .pdf files stay online for printing elsewhere. A new version replaces the old copy.
     The copy is always fetched fresh from the internet (cache 'reload'): GitHub lets browsers keep pages
     for 10 minutes, and saving from that store once put an older page into a newer version's copy."""
     urls, digest = ["./"], hashlib.sha256()
     for rel in sorted(written):
-        if rel in (".nojekyll", "404.html"):
+        if rel in (".nojekyll", "404.html") or rel.endswith(".pdf"):
             continue
         digest.update(rel.encode() + b"\0" + (OUT / rel).read_bytes())
         urls.append("./" + rel)
